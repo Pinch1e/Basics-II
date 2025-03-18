@@ -1,0 +1,59 @@
+import React, { useState, useRef } from "react";
+import { View, Button, Text, TextInput, Alert } from "react-native";
+import SignatureScreen from "react-native-signature-canvas";
+import { format } from "date-fns";
+
+export default function App() {
+  const [date, setDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [signature, setSignature] = useState(null);
+  const ref = useRef();
+
+  const handleSignature = (sig) => {
+    setSignature(sig);
+  };
+
+  const handleClear = () => {
+    ref.current.clearSignature();
+    setSignature(null);
+  };
+
+  const handleSubmit = () => {
+    if (!signature) {
+      Alert.alert("Error", "Please provide a signature.");
+      return;
+    }
+    const formData = {
+      date,
+      signature,
+    };
+    console.log("Submitting data:", formData);
+    Alert.alert("Success", "Signature and date submitted!");
+    // Here you would send formData to Scope API if available.
+  };
+
+  return (
+    <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
+      <Text style={{ fontSize: 18, marginBottom: 10 }}>Enter Date:</Text>
+      <TextInput
+        value={date}
+        onChangeText={setDate}
+        style={{ borderWidth: 1, padding: 10, marginBottom: 20 }}
+      />
+
+      <Text style={{ fontSize: 18, marginBottom: 10 }}>Sign Below:</Text>
+      <View style={{ borderWidth: 1, height: 300, marginBottom: 10 }}>
+        <SignatureScreen
+          ref={ref}
+          onOK={handleSignature}
+          onEmpty={() => Alert.alert("Error", "Signature is empty")} 
+          clearText="Clear"
+          confirmText="Done"
+        />
+      </View>
+
+      <Button title="Clear Signature" onPress={handleClear} />
+      <View style={{ marginVertical: 10 }} />
+      <Button title="Submit" onPress={handleSubmit} />
+    </View>
+  );
+}
